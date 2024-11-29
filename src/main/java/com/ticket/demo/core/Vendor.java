@@ -1,5 +1,6 @@
 package com.ticket.demo.core;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.ticket.demo.core.pools.TicketPool;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
@@ -12,7 +13,9 @@ import java.util.concurrent.LinkedBlockingQueue;
 public class Vendor implements Runnable {
     private String vendorName;
     private String id;
+    @JsonIgnore
     private BlockingQueue<TicketPool> taskQueue = new LinkedBlockingQueue<>();
+    @JsonIgnore
     private boolean running = true;
 
     public Vendor(String vendorName, String id) {

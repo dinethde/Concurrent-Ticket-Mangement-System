@@ -11,10 +11,10 @@ import java.util.Queue;
 @Data
 public class TicketPool {
     private int totalTickets;
-    private final String ticketPoolName;
-    private final int maxTicketCapacity;
+    private String ticketPoolName;
+    private int maxTicketCapacity;
     private Queue<Ticket> tickets = new LinkedList<>();
-    private final String vendorId;
+    private String vendorId;
     private String ticketPoolDescription;
     private boolean ticketCategories; // true if categories exist
     private Map<String, Double> ticketPrice; // Category -> Price
@@ -22,17 +22,14 @@ public class TicketPool {
     private LocalDateTime date;
 
 
-    public TicketPool(TicketPool ticketPool){
+    public TicketPool(TicketPool ticketPool) {
         this.ticketPoolName = ticketPool.ticketPoolName;
         this.vendorId = ticketPool.vendorId;
         this.maxTicketCapacity = ticketPool.maxTicketCapacity;
-
     }
 
-    public TicketPool(String ticketPoolName, String vendorId, int maxTicketCapacity) {
-        this.ticketPoolName = ticketPoolName;
-        this.vendorId = vendorId;
-        this.maxTicketCapacity = maxTicketCapacity;
+    public TicketPool() {
+
     }
 
     // Thread-safe method to add a ticket
@@ -76,3 +73,5 @@ public class TicketPool {
 
 }
 
+
+// This is my ticket pool class can you find cause for the error z

@@ -25,8 +25,7 @@ public class ManageVendors {
     }
 
     // Assign an event creation task to the appropriate vendor
-    public boolean createEvents(TicketPool ticketPoolEvent) {
-
+    public synchronized void createEvents(TicketPool ticketPoolEvent) {
         TicketPool ticketPool = new TicketPool(ticketPoolEvent);
         Vendor vendor;
         synchronized (vendorList) {
@@ -36,10 +35,8 @@ public class ManageVendors {
         if (vendor != null) {
             vendor.addTask(ticketPool); // Add the event creation task to the vendor's queue
             log.info("Task assigned to Vendor [{}] for event [{}]", vendor.getVendorName(), ticketPool.getTicketPoolName());
-            return true;
         } else {
             log.warn("Vendor with ID [{}] not found. Skipping event creation.", ticketPool.getVendorId());
-            return false;
         }
     }
 }
