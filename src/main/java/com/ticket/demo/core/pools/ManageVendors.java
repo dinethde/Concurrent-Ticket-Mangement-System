@@ -31,7 +31,6 @@ public class ManageVendors {
         synchronized (vendorList) {
             vendor = vendorList.get(ticketPool.getVendorId());
         }
-
         if (vendor != null) {
             vendor.addTask(ticketPool); // Add the event creation task to the vendor's queue
             log.info("Task assigned to Vendor [{}] for event [{}]", vendor.getVendorName(), ticketPool.getTicketPoolName());

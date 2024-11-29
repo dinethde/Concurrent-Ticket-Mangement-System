@@ -23,6 +23,4 @@ public class VendorController {
     public void createEvent(@RequestBody TicketPool event) {
         manageVendors.createEvents(event);
     }
-
-
 }

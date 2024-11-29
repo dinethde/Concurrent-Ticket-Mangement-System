@@ -5,6 +5,7 @@ import com.ticket.demo.core.pools.TicketPool;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 
+import java.time.LocalDateTime;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
@@ -40,6 +41,7 @@ public class Vendor implements Runnable {
                 // Wait for a task from the queue
                 TicketPool ticketPool = taskQueue.take(); // Blocks until a task is available
                 vendorCreateEvent(ticketPool);
+
             } catch (InterruptedException e) {
                 log.info("Vendor [{}] interrupted.", vendorName);
                 Thread.currentThread().interrupt();
@@ -49,15 +51,16 @@ public class Vendor implements Runnable {
         log.info("Vendor [{}] stopped.", vendorName);
     }
 
-    // Vendor creates an event
     private void vendorCreateEvent(TicketPool ticketPool) {
-        log.info("Vendor [{}] is creating event [{}]", vendorName, ticketPool.getTicketPoolName());
-        // Simulate event creation
+        log.info("[{}] Vendor [{}] is creating event [{}]",
+                LocalDateTime.now(), vendorName, ticketPool.getTicketPoolName());
+        // Simulate work (optional)
         try {
-            Thread.sleep(1000); // Simulate processing time
+            Thread.sleep(5000); // Optional simulation delay
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
         }
-        log.info("Vendor [{}] created event [{}] successfully.", vendorName, ticketPool.getTicketPoolName());
+        log.info("[{}] Vendor [{}] created event [{}] successfully.",
+                LocalDateTime.now(), vendorName, ticketPool.getTicketPoolName());
     }
 }
