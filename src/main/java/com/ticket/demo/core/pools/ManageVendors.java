@@ -9,8 +9,8 @@ import java.util.HashMap;
 @Component
 @Slf4j
 public class ManageVendors {
-    private final HashMap<String, Vendor> vendorList = new HashMap<>(); // Vendor ID -> Vendor
-    private final HashMap<String, Thread> vendorThreads = new HashMap<>(); // Vendor ID -> Vendor Thread
+    private final HashMap<String, Vendor> vendorList = new HashMap<>();
+    private final HashMap<String, Thread> vendorThreads = new HashMap<>();
 
     // Add a new vendor and start its thread
     public synchronized void createVendors(Vendor vendor) {

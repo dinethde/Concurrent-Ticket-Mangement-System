@@ -21,7 +21,6 @@ public class TicketPool {
     private Map<String, Integer> ticketCategoriesQnt; // Category -> Quantity
     private LocalDateTime date;
 
-
     public TicketPool(TicketPool ticketPool) {
         this.ticketPoolName = ticketPool.ticketPoolName;
         this.vendorId = ticketPool.vendorId;
