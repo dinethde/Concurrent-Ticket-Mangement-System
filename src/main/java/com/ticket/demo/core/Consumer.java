@@ -3,42 +3,58 @@ package com.ticket.demo.core;
 import com.ticket.demo.core.pools.TicketPool;
 import lombok.Data;
 
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.LinkedBlockingQueue;
+
+
 @Data
-public class Consumer implements Runnable { // Implement Runnable to make Consumer multi-threaded
+public class Consumer implements Runnable {
     private String consumerName;
+    private String consumerId;
     private String consumerEmail;
-    private Ticket ticketId; // Holds the ticket purchased by the consumer
-
-    private TicketPool ticketPool; // Shared TicketPool
-    private String category; // Ticket category to buy from
-    private int retrievalRate; // Rate in milliseconds at which tickets are bought
-
+    private String ticketId; // Holds the ticket purchased by the consumer
     private volatile boolean running = true; // Used to control the thread lifecycle
+    private final BlockingQueue<TicketPool> taskQueue = new LinkedBlockingQueue<>(); // Tasks for this consumer
 
-    public Consumer(String consumerName, String consumerEmail, TicketPool ticketPool, String category, int retrievalRate) {
-        this.consumerName = consumerName;
-        this.consumerEmail = consumerEmail;
-        this.ticketPool = ticketPool;
-        this.category = category;
-        this.retrievalRate = retrievalRate; // Time in milliseconds to simulate delay between purchases
+
+    public Consumer(Consumer consumer) {
+        this.consumerName = consumer.consumerName;
+        this.consumerEmail = consumer.consumerEmail;
+        this.ticketPoolId = consumer.ticketPoolId;
+        this.consumerId = consumer.consumerId;
+    }
+
+    public void addTask(TicketPool ticketPool) {
+        try {
+            taskQueue.put(ticketPool); // Blocks if the queue is full
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            System.out.println("Consumer [" + consumerName + "] was interrupted while adding a task.");
+        }
+    }
+
+    public void stop() {
+        running = false;
     }
 
     @Override
     public void run() {
-
-    }
-
-    public void stop() {
-        running = false; // Set the flag to stop the thread
-    }
-
-    public void generateReceipt() {
-        if (ticketId != null) {
-            System.out.println("Receipt: Ticket ID - " + ticketId.getTicketId() +
-                    ", Category - " + ticketId.getTicketCategory() +
-                    ", Timestamp - " + ticketId.getTimeStamp());
-        } else {
-            System.out.println("No ticket purchased yet.");
+        while (running) {
+            try {
+                // Wait for a task from the queue
+                TicketPool ticketPool = taskQueue.take(); // Blocks until a task is available
+                Ticket ticket = ticketPool.buyTicket(consumerId); // Attempt to buy a ticket from the pool
+                if (ticket != null && ticket.buy()) {
+                    System.out.println(consumerName + " successfully purchased ticket " + ticket.getTicketId());
+                } else {
+                    System.out.println(consumerName + " could not purchase a ticket from pool ");
+                }
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+                System.out.println("Consumer [" + consumerName + "] interrupted.");
+            }
         }
     }
+
 }
+

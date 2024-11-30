@@ -65,3 +65,6 @@ public class Vendor implements Runnable {
                 LocalDateTime.now(), vendorName, ticketPool.getTicketPoolName());
     }
 }
+
+
+// In above code what while loop inside run method do and what is stop method do

@@ -12,6 +12,7 @@ import java.util.concurrent.ConcurrentHashMap;
 @Data
 public class TicketPool {
     private int totalTickets;
+    private String eventId;
     private String ticketPoolName;
     private int maxTicketCapacity;
     private String vendorId;
@@ -20,6 +21,7 @@ public class TicketPool {
     private Map<String, Double> ticketPrice; // Category -> Price
     private Map<String, Integer> ticketCategoriesQnt; // Category -> Quantity
     private LocalDateTime date;
+    private int ticketsSold = 0; // Tracks the number of tickets sold
 
     private ConcurrentHashMap<Integer, Ticket> ticketArray = new ConcurrentHashMap<>();
 
@@ -33,38 +35,29 @@ public class TicketPool {
 
     }
 
+    public synchronized Ticket buyTicket(String consumerId) {
+        if (ticketsSold < maxTicketCapacity) { // Check if tickets are still available
+            ticketsSold++;
+            Ticket newTicket = new Ticket(eventId, consumerId); // Create a new ticket
+            newTicket.setTicketId(ticketsSold); // Assign a unique ID
+            ticketArray.put(newTicket.getTicketId(), newTicket); // Add to the map
+            return newTicket;
+        }
+        return null; // No tickets available
+    }
+
     // Thread-safe method to add a ticket
     public synchronized void addTicket(Ticket ticket) {
         ticketArray.put(ticket.getTicketId(), ticket);
     }
 
-    public synchronized void getTicket(int ticketId) {
-        ticketArray.get(ticketId);
-    }
-
-    // Thread-safe method to remove a ticket
-    public synchronized Ticket removeTicket() {
-        while (ticketArray.isEmpty()) {
-            try {
-                System.out.println("TicketPool is empty. Waiting for tickets...");
-                wait(); // Block consumer threads when pool is empty
-            } catch (InterruptedException e) {
-                Thread.currentThread().interrupt(); // Restore interrupt status
-                return null;
-            }
-        }
-        Ticket ticket = ticketArray.poll();
-        totalTickets--;
-        System.out.println("Removed ticket: " + ticket.getTicketId() + " from pool " + ticketPoolName);
-        notifyAll(); // Notify producer threads that space is available
-        return ticket;
+    public synchronized Ticket getTicket(int ticketId) {
+        return ticketArray.get(ticketId);
     }
 
     public synchronized int getAvailableTickets() {
         return ticketArray.size();
     }
-
 }
 
 
-// This is my ticket pool class can you find cause for the error z

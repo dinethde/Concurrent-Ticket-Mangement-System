@@ -25,7 +25,7 @@ public class ManageVendors {
     }
     // Assign an event creation task to the appropriate vendor
     public synchronized void createEvents(TicketPool ticketPoolEvent) {
-        TicketPool ticketPool = new TicketPool(ticketPoolEvent);
+        TicketPool ticketPool = new TicketPool();
         Vendor vendor;
         synchronized (vendorList) {
             vendor = vendorList.get(ticketPool.getVendorId());
