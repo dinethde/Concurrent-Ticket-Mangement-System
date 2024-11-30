@@ -23,7 +23,6 @@ public class ManageVendors {
 
         log.info("Vendor [{}] added and thread started.", newVendor.getVendorName());
     }
-
     // Assign an event creation task to the appropriate vendor
     public synchronized void createEvents(TicketPool ticketPoolEvent) {
         TicketPool ticketPool = new TicketPool(ticketPoolEvent);

@@ -7,6 +7,7 @@ import java.time.LocalDateTime;
 import java.util.LinkedList;
 import java.util.Map;
 import java.util.Queue;
+import java.util.concurrent.ConcurrentHashMap;
 
 @Data
 public class TicketPool {
@@ -20,7 +21,7 @@ public class TicketPool {
     private Map<String, Integer> ticketCategoriesQnt; // Category -> Quantity
     private LocalDateTime date;
 
-    private Queue<Ticket> tickets = new LinkedList<>();
+    private ConcurrentHashMap<Integer, Ticket> ticketArray = new ConcurrentHashMap<>();
 
     public TicketPool(TicketPool ticketPool) {
         this.ticketPoolName = ticketPool.ticketPoolName;
@@ -32,27 +33,18 @@ public class TicketPool {
 
     }
 
-
     // Thread-safe method to add a ticket
     public synchronized void addTicket(Ticket ticket) {
-        while (tickets.size() >= maxTicketCapacity) {
-            try {
-                System.out.println("TicketPool is full. Waiting to add tickets...");
-                wait(); // Block producer threads when pool is full
-            } catch (InterruptedException e) {
-                Thread.currentThread().interrupt(); // Restore interrupt status
-                return;
-            }
-        }
-        tickets.add(ticket);
-        totalTickets++;
-        System.out.println("Added ticket: " + ticket.getTicketId() + " to pool " + ticketPoolName);
-        notifyAll(); // Notify consumer threads that a ticket is available
+        ticketArray.put(ticket.getTicketId(), ticket);
+    }
+
+    public synchronized void getTicket(int ticketId) {
+        ticketArray.get(ticketId);
     }
 
     // Thread-safe method to remove a ticket
     public synchronized Ticket removeTicket() {
-        while (tickets.isEmpty()) {
+        while (ticketArray.isEmpty()) {
             try {
                 System.out.println("TicketPool is empty. Waiting for tickets...");
                 wait(); // Block consumer threads when pool is empty
@@ -61,7 +53,7 @@ public class TicketPool {
                 return null;
             }
         }
-        Ticket ticket = tickets.poll();
+        Ticket ticket = ticketArray.poll();
         totalTickets--;
         System.out.println("Removed ticket: " + ticket.getTicketId() + " from pool " + ticketPoolName);
         notifyAll(); // Notify producer threads that space is available
@@ -69,7 +61,7 @@ public class TicketPool {
     }
 
     public synchronized int getAvailableTickets() {
-        return tickets.size();
+        return ticketArray.size();
     }
 
 }
