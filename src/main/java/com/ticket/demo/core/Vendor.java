@@ -54,12 +54,13 @@ public class Vendor implements Runnable {
     private void vendorCreateEvent(TicketPool ticketPool) {
         log.info("[{}] Vendor [{}] is creating event [{}]",
                 LocalDateTime.now(), vendorName, ticketPool.getTicketPoolName());
+
         // Simulate work (optional)
-        try {
-            Thread.sleep(5000); // Optional simulation delay
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-        }
+            try {
+                Thread.sleep(5000); // Optional simulation delay
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+            }
         log.info("[{}] Vendor [{}] created event [{}] successfully.",
                 LocalDateTime.now(), vendorName, ticketPool.getTicketPoolName());
     }

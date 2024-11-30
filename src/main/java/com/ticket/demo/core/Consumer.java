@@ -25,27 +25,7 @@ public class Consumer implements Runnable { // Implement Runnable to make Consum
 
     @Override
     public void run() {
-        while (running) { // Continuously buy tickets until stopped
-            try {
-                Thread.sleep(retrievalRate); // Simulate delay in ticket retrieval
-                synchronized (ticketPool) { // Synchronize to ensure safe interaction with the shared TicketPool
-                    if (ticketPool.getAvailableTickets() > 0) {
-                        this.ticketId = ticketPool.removeTicket(); // Safely remove a ticket from the pool
-                        if (ticketId != null) {
-                            System.out.println(consumerName + " bought ticket ID: " + ticketId.getTicketId() +
-                                    " in category: " + category);
-                        }
-                    } else {
-                        System.out.println(consumerName + ": No tickets available in the selected category.");
-                        ticketPool.wait(); // Wait if no tickets are available
-                    }
-                }
-            } catch (InterruptedException e) {
-                System.out.println(consumerName + " was interrupted.");
-                Thread.currentThread().interrupt(); // Restore the interrupt status
-                break;
-            }
-        }
+
     }
 
     public void stop() {

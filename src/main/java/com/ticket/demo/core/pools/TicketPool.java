@@ -13,13 +13,14 @@ public class TicketPool {
     private int totalTickets;
     private String ticketPoolName;
     private int maxTicketCapacity;
-    private Queue<Ticket> tickets = new LinkedList<>();
     private String vendorId;
     private String ticketPoolDescription;
     private boolean ticketCategories; // true if categories exist
     private Map<String, Double> ticketPrice; // Category -> Price
     private Map<String, Integer> ticketCategoriesQnt; // Category -> Quantity
     private LocalDateTime date;
+
+    private Queue<Ticket> tickets = new LinkedList<>();
 
     public TicketPool(TicketPool ticketPool) {
         this.ticketPoolName = ticketPool.ticketPoolName;
@@ -30,6 +31,7 @@ public class TicketPool {
     public TicketPool() {
 
     }
+
 
     // Thread-safe method to add a ticket
     public synchronized void addTicket(Ticket ticket) {
