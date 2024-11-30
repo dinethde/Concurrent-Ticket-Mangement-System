@@ -20,7 +20,6 @@ public class Consumer implements Runnable {
     public Consumer(Consumer consumer) {
         this.consumerName = consumer.consumerName;
         this.consumerEmail = consumer.consumerEmail;
-        this.ticketPoolId = consumer.ticketPoolId;
         this.consumerId = consumer.consumerId;
     }
 
