@@ -7,6 +7,7 @@ import lombok.extern.slf4j.Slf4j;
 
 import java.time.LocalDateTime;
 import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.LinkedBlockingQueue;
 
 @Data
@@ -15,9 +16,10 @@ public class Vendor implements Runnable {
     private String vendorName;
     private String vendorId;
     @JsonIgnore
-    private BlockingQueue<TicketPool> taskQueue = new LinkedBlockingQueue<>();
+    private BlockingQueue<TicketPool> vendorTaskQueue = new LinkedBlockingQueue<>();
     @JsonIgnore
     private boolean running = true;
+    private ConcurrentHashMap<String, TicketPool> vendorEventList = new ConcurrentHashMap<>();
 
     public Vendor(String vendorName, String vendorId) {
         this.vendorName = vendorName;
@@ -25,13 +27,11 @@ public class Vendor implements Runnable {
     }
 
     // Add a task to the vendor's queue
-    public void addTask(TicketPool ticketPool) {
-        taskQueue.add(ticketPool);
-    }
-
-    // Stop the vendor thread gracefully
-    public void stop() {
-        running = false;
+    public synchronized void addTask(TicketPool ticketPool) {
+        log.info(vendorId+" vendor in add task");
+        vendorTaskQueue.add(ticketPool);
+        vendorEventList.put(ticketPool.getVendorId(), ticketPool);
+        log.info(vendorTaskQueue.toString()+" vendorEventList in add task");
     }
 
     @Override
@@ -39,7 +39,7 @@ public class Vendor implements Runnable {
         while (running) {
             try {
                 // Wait for a task from the queue
-                TicketPool ticketPool = taskQueue.take(); // Blocks until a task is available
+                TicketPool ticketPool = vendorTaskQueue.take(); // Blocks until a task is available
                 vendorCreateEvent(ticketPool);
 
             } catch (InterruptedException e) {
@@ -50,6 +50,8 @@ public class Vendor implements Runnable {
         }
         log.info("Vendor [{}] stopped.", vendorName);
     }
+
+    // Here I used the method you suggest. But isn't this memory insufficient?
 
     private void vendorCreateEvent(TicketPool ticketPool) {
         log.info("[{}] Vendor [{}] is creating event [{}]",
@@ -65,6 +67,3 @@ public class Vendor implements Runnable {
                 LocalDateTime.now(), vendorName, ticketPool.getTicketPoolName());
     }
 }
-
-
-// In above code what while loop inside run method do and what is stop method do

@@ -5,6 +5,7 @@ import com.ticket.demo.core.pools.TicketPool;
 import lombok.Data;
 
 import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.LinkedBlockingQueue;
 
 
@@ -19,6 +20,7 @@ public class Consumer implements Runnable {
     private volatile boolean running = true; // Used to control the thread lifecycle
     @JsonIgnore
     private final BlockingQueue<TicketPool> taskQueue = new LinkedBlockingQueue<>(); // Tasks for this consumer
+    private ConcurrentHashMap<String, Ticket> consumerTicketsList = new ConcurrentHashMap<>();
 
     public Consumer(Consumer consumer) {
         this.consumerName = consumer.consumerName;
@@ -31,7 +33,7 @@ public class Consumer implements Runnable {
     public void addTask(TicketPool ticketPool) {
         try {
             taskQueue.put(ticketPool); // Blocks if the queue is full
-        } catch (InterruptedException e) {
+            } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
             System.out.println("Consumer [" + consumerName + "] was interrupted while adding a task.");
         }
@@ -48,6 +50,8 @@ public class Consumer implements Runnable {
                 // Wait for a task from the queue
                 TicketPool ticketPool = taskQueue.take(); // Blocks until a task is available
                 Ticket ticket = ticketPool.buyTicket(consumerId); // Attempt to buy a ticket from the pool
+                consumerTicketsList.put(consumerId, ticket);
+
                 if (ticket != null && ticket.buy()) {
                     System.out.println(consumerName + " successfully purchased ticket " + ticket.getTicketId());
                 } else {

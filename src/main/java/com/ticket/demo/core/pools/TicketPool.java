@@ -4,9 +4,7 @@ import com.ticket.demo.core.Ticket;
 import lombok.Data;
 
 import java.time.LocalDateTime;
-import java.util.LinkedList;
 import java.util.Map;
-import java.util.Queue;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Data
@@ -23,12 +21,13 @@ public class TicketPool {
     private LocalDateTime date;
     private int ticketsSold = 0; // Tracks the number of tickets sold
 
-    private ConcurrentHashMap<Integer, Ticket> ticketArray = new ConcurrentHashMap<>();
+    private ConcurrentHashMap<String, Ticket> ticketArray = new ConcurrentHashMap<>();
 
     public TicketPool(TicketPool ticketPool) {
         this.ticketPoolName = ticketPool.ticketPoolName;
         this.vendorId = ticketPool.vendorId;
         this.maxTicketCapacity = ticketPool.maxTicketCapacity;
+        this.eventId = ticketPool.eventId;
     }
 
     public TicketPool() {
@@ -39,7 +38,7 @@ public class TicketPool {
         if (ticketsSold < maxTicketCapacity) { // Check if tickets are still available
             ticketsSold++;
             Ticket newTicket = new Ticket(eventId, consumerId); // Create a new ticket
-            newTicket.setTicketId(ticketsSold); // Assign a unique ID
+            newTicket.setTicketId(ticketsSold+""); // Assign a unique ID
             ticketArray.put(newTicket.getTicketId(), newTicket); // Add to the map
             return newTicket;
         }
@@ -51,8 +50,12 @@ public class TicketPool {
         ticketArray.put(ticket.getTicketId(), ticket);
     }
 
-    public synchronized Ticket getTicket(int ticketId) {
+    public synchronized Ticket getTicket(String ticketId) {
         return ticketArray.get(ticketId);
+    }
+
+    public synchronized void printDetails(){
+        System.out.println();
     }
 
     public synchronized int getAvailableTickets() {

@@ -3,11 +3,13 @@ package com.ticket.demo.controller;
 import com.ticket.demo.core.pools.ManageVendors;
 import com.ticket.demo.core.pools.TicketPool;
 import com.ticket.demo.core.Vendor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
+@Slf4j
 @RestController
 public class VendorController {
 
@@ -16,13 +18,11 @@ public class VendorController {
 
     @PostMapping("/vendor")
     public void createVendor(@RequestBody Vendor vendor) {
-        System.out.println(vendor);
         manageVendors.createVendors(vendor);
     }
 
     @PostMapping("/event")
     public void createEvent(@RequestBody TicketPool event) {
-        System.out.println(event);
         manageVendors.createEvents(event);
     }
 }

@@ -1,12 +1,14 @@
 package com.ticket.demo.core.pools;
 
-import com.ticket.demo.core.ManageTicketPool;
 import com.ticket.demo.core.Vendor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.HashMap;
+import java.util.Map;
 
 @Slf4j
 @Component
@@ -28,10 +30,10 @@ public class ManageVendors {
 
         log.info("Vendor [{}] added and thread started.", newVendor.getVendorName());
     }
+
     // Assign an event creation task to the appropriate vendor
     public synchronized void createEvents(TicketPool ticketPoolEvent) {
         TicketPool ticketPool = new TicketPool(ticketPoolEvent);
-
         Vendor vendor;
         synchronized (vendorList) {
             vendor = vendorList.get(ticketPool.getVendorId());
@@ -39,10 +41,29 @@ public class ManageVendors {
         if (vendor != null) {
             vendor.addTask(ticketPool); // Add the event creation task to the vendor's queue
             manageTicketPool.addTicketPool(ticketPool); //
-
             log.info("Task assigned to Vendor [{}] for event [{}]", vendor.getVendorName(), ticketPool.getTicketPoolName());
+
         } else {
             log.warn("Vendor with ID [{}] not found. Skipping event creation.", ticketPool.getVendorId());
+        }
+    }
+
+    public void writeVendors(FileWriter writer) throws IOException {
+        writer.write("\n=========== Vendors ===========\n");
+        for (Map.Entry<String, Vendor> entry : vendorList.entrySet()) {
+            Vendor vendor = entry.getValue();
+            writer.write("Vendor Name: " + vendor.getVendorName()
+                    + " | Vendor ID: " + vendor.getVendorId()
+                    + " | Assigned Ticket Pools: " + vendor.getVendorEventList().size() + "\n");
+
+            // List assigned ticket pools
+            writer.write("  Assigned Events:\n");
+            for (Map.Entry<String, TicketPool> ticketPoolEntry: vendor.getVendorEventList().entrySet()){
+                TicketPool pool = ticketPoolEntry.getValue();
+                writer.write("    Event: " + pool.getEventId()
+                        + " | Pool Name: " + pool.getTicketPoolName()
+                        + " | Max Capacity: " + pool.getMaxTicketCapacity() + "\n");
+            }
         }
     }
 }

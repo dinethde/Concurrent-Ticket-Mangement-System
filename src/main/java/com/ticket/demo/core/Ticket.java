@@ -5,7 +5,7 @@ import java.util.concurrent.locks.ReentrantLock;
 
 @Data
 public class Ticket {
-    private int ticketId;
+    private String ticketId;
     private String eventId;
 
     private boolean isSold = false; // Indicates if the ticket is sold
