@@ -13,15 +13,15 @@ import java.util.concurrent.LinkedBlockingQueue;
 @Slf4j
 public class Vendor implements Runnable {
     private String vendorName;
-    private String id;
+    private String vendorId;
     @JsonIgnore
     private BlockingQueue<TicketPool> taskQueue = new LinkedBlockingQueue<>();
     @JsonIgnore
     private boolean running = true;
 
-    public Vendor(String vendorName, String id) {
+    public Vendor(String vendorName, String vendorId) {
         this.vendorName = vendorName;
-        this.id = id;
+        this.vendorId = vendorId;
     }
 
     // Add a task to the vendor's queue

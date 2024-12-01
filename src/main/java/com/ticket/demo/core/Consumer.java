@@ -1,5 +1,6 @@
 package com.ticket.demo.core;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.ticket.demo.core.pools.TicketPool;
 import lombok.Data;
 
@@ -9,19 +10,23 @@ import java.util.concurrent.LinkedBlockingQueue;
 
 @Data
 public class Consumer implements Runnable {
-    private String consumerName;
     private String consumerId;
+    private String consumerName;
     private String consumerEmail;
-    private String ticketId; // Holds the ticket purchased by the consumer
+    @JsonIgnore
+    private String ticketId;
+    @JsonIgnore
     private volatile boolean running = true; // Used to control the thread lifecycle
+    @JsonIgnore
     private final BlockingQueue<TicketPool> taskQueue = new LinkedBlockingQueue<>(); // Tasks for this consumer
-
 
     public Consumer(Consumer consumer) {
         this.consumerName = consumer.consumerName;
         this.consumerEmail = consumer.consumerEmail;
         this.consumerId = consumer.consumerId;
     }
+
+    public Consumer(){}
 
     public void addTask(TicketPool ticketPool) {
         try {
@@ -56,4 +61,3 @@ public class Consumer implements Runnable {
     }
 
 }
-

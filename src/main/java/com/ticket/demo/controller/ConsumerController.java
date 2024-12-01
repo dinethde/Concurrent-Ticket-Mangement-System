@@ -9,18 +9,20 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-public class consumerController {
+public class ConsumerController {
 
     @Autowired
     ManageConsumers manageConsumers;
 
     @PostMapping("/create-customer")
     public void createConsumer(@RequestBody Consumer consumer) {
+        System.out.println(consumer);
         manageConsumers.createConsumers(consumer);
     }
 
     @PostMapping("/buy-ticket")
     public void buyTicket(@RequestBody Ticket ticket) {
+        System.out.println(ticket);
         manageConsumers.buyTicket(ticket);
     }
 

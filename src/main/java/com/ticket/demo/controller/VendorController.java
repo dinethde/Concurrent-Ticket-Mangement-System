@@ -16,11 +16,13 @@ public class VendorController {
 
     @PostMapping("/vendor")
     public void createVendor(@RequestBody Vendor vendor) {
+        System.out.println(vendor);
         manageVendors.createVendors(vendor);
     }
 
     @PostMapping("/event")
     public void createEvent(@RequestBody TicketPool event) {
+        System.out.println(event);
         manageVendors.createEvents(event);
     }
 }
