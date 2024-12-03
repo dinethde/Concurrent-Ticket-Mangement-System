@@ -15,11 +15,11 @@ import java.util.concurrent.LinkedBlockingQueue;
 public class Vendor implements Runnable {
     private String vendorName;
     private String vendorId;
+    private ConcurrentHashMap<String, TicketPool> vendorEventList = new ConcurrentHashMap<>();
     @JsonIgnore
     private BlockingQueue<TicketPool> vendorTaskQueue = new LinkedBlockingQueue<>();
     @JsonIgnore
     private boolean running = true;
-    private ConcurrentHashMap<String, TicketPool> vendorEventList = new ConcurrentHashMap<>();
 
     public Vendor(String vendorName, String vendorId) {
         this.vendorName = vendorName;

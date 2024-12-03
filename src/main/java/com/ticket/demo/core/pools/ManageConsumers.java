@@ -40,7 +40,7 @@ public class ManageConsumers {
         }
         if (consumer1 != null) {
             TicketPool ticketPool = ticketPoolManager.getTicketPool(ticket.getEventId());
-            System.out.println(ticketPool);
+            log.info("Ticket pool : " + ticketPool);
 
             consumer1.addTask(ticketPool); // Add the event creation task to the Consumer's queue
 

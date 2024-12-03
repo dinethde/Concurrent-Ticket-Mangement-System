@@ -10,7 +10,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 @Component
 public class ManageTicketPool {
-    private final ConcurrentHashMap<String, TicketPool> ticketPoolArray = new ConcurrentHashMap<>();
+    public final ConcurrentHashMap<String, TicketPool> ticketPoolArray = new ConcurrentHashMap<>();
 
     public void addTicketPool(TicketPool ticketPool) {
         ticketPoolArray.put(ticketPool.getEventId(), ticketPool);

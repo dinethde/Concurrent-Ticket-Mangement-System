@@ -2,12 +2,14 @@ package com.ticket.demo.core.pools;
 
 import com.ticket.demo.core.Ticket;
 import lombok.Data;
+import lombok.extern.slf4j.Slf4j;
 
 import java.time.LocalDateTime;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Data
+@Slf4j
 public class TicketPool {
     private int totalTickets;
     private String eventId;
@@ -28,21 +30,42 @@ public class TicketPool {
         this.vendorId = ticketPool.vendorId;
         this.maxTicketCapacity = ticketPool.maxTicketCapacity;
         this.eventId = ticketPool.eventId;
+
+        generateTickets();
     }
 
     public TicketPool() {
 
     }
 
-    public synchronized Ticket buyTicket(String consumerId) {
-        if (ticketsSold < maxTicketCapacity) { // Check if tickets are still available
-            ticketsSold++;
-            Ticket newTicket = new Ticket(eventId, consumerId); // Create a new ticket
-            newTicket.setTicketId(ticketsSold+""); // Assign a unique ID
-            ticketArray.put(newTicket.getTicketId(), newTicket); // Add to the map
-            return newTicket;
+    public void generateTickets() {
+        for (int i = 1; i <= maxTicketCapacity; i++) {
+            Ticket ticket = new Ticket(eventId, null); // Consumer ID is null for unsold tickets
+            ticketArray.put(ticket.getTicketId(), ticket); // Store in the map
         }
-        return null; // No tickets available
+        log.info(" Array size : "+ticketArray.size());
+    }
+
+    public void printTickets() {
+        for (int i = 0; i < ticketArray.size(); i++) {
+            log.info(" Ticket : "+i+" : " +ticketArray.get((i+1)+"").getTicketId());
+        }
+    }
+
+    public synchronized Ticket buyTicket(String consumerId) {
+        // Check if there are any available tickets
+        for (Map.Entry<String, Ticket> entry : ticketArray.entrySet()) {
+            Ticket ticket = entry.getValue();
+
+            // Use the `buy` method to lock and mark the ticket as sold
+            if (ticket.buy()) {
+                ticket.setConsumerId(consumerId); // Assign consumer to the ticket
+                return ticket; // Return the sold ticket
+            }
+        }
+
+        // No tickets available
+        return null;
     }
 
     // Thread-safe method to add a ticket
@@ -54,13 +77,10 @@ public class TicketPool {
         return ticketArray.get(ticketId);
     }
 
-    public synchronized void printDetails(){
-        System.out.println();
-    }
-
     public synchronized int getAvailableTickets() {
         return ticketArray.size();
     }
+
 }
 
 

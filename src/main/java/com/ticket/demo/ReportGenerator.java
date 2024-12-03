@@ -32,9 +32,8 @@ public class ReportGenerator {
             manageVendors.writeVendors(writer);
             manageConsumers.writeConsumers(writer);
 
-
         } catch (IOException e) {
-            System.err.println("Error generating report: " + e.getMessage());
+            log.warn("Error generating report: " + e.getMessage());
             e.printStackTrace();
         }
 
