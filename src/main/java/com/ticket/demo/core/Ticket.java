@@ -12,15 +12,16 @@ public class Ticket {
     private String ticketId;
     private String eventId;
     private String consumerId;
-
+    private String ticketCategory;
+    private double ticketPrice;
     private boolean isSold = false; // Indicates if the ticket is sold
-    private final ReentrantLock lock = new ReentrantLock(); // Lock for this ticket
 
+    private final ReentrantLock lock = new ReentrantLock(); // Lock for this ticket
 
     public Ticket(String eventId, String consumerId) {
         this.eventId = eventId;
+        this.ticketId = generateTicketId();
         this.consumerId = consumerId;
-        this.ticketId = generateTicketId() + "";
     }
 
     public Ticket(){}
@@ -37,7 +38,12 @@ public class Ticket {
             lock.unlock();
         }
     }
-    public int generateTicketId() {
-        return ticketCounter.getAndIncrement();
+
+    public String generateTicketId() {
+        return ticketCounter.getAndIncrement()+"";
+    }
+
+    public static void resetTicketCounter() {
+        ticketCounter.set(1);
     }
 }

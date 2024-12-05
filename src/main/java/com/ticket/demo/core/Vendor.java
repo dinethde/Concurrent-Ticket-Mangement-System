@@ -9,29 +9,32 @@ import java.time.LocalDateTime;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.atomic.AtomicInteger;
 
 @Data
 @Slf4j
 public class Vendor implements Runnable {
+    private static AtomicInteger SVENDORID = new AtomicInteger(1);
     private String vendorName;
     private String vendorId;
+    private String vendorPassword;
+
+    @JsonIgnore
+    private boolean running = true;
+    @JsonIgnore
     private ConcurrentHashMap<String, TicketPool> vendorEventList = new ConcurrentHashMap<>();
     @JsonIgnore
     private BlockingQueue<TicketPool> vendorTaskQueue = new LinkedBlockingQueue<>();
-    @JsonIgnore
-    private boolean running = true;
 
     public Vendor(String vendorName, String vendorId) {
         this.vendorName = vendorName;
-        this.vendorId = vendorId;
+        this.vendorId = generateVendorId();
     }
 
     // Add a task to the vendor's queue
     public synchronized void addTask(TicketPool ticketPool) {
-        log.info(vendorId+" vendor in add task");
         vendorTaskQueue.add(ticketPool);
         vendorEventList.put(ticketPool.getVendorId(), ticketPool);
-        log.info(vendorTaskQueue.toString()+" vendorEventList in add task");
     }
 
     @Override
@@ -65,5 +68,13 @@ public class Vendor implements Runnable {
             }
         log.info("[{}] Vendor [{}] created event [{}] successfully.",
                 LocalDateTime.now(), vendorName, ticketPool.getTicketPoolName());
+    }
+
+    public int getVendorEventListSize() {
+        return vendorEventList.size();
+    }
+
+    public String generateVendorId() {
+        return SVENDORID.getAndIncrement()+"";
     }
 }

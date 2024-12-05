@@ -11,19 +11,22 @@ import java.util.concurrent.ConcurrentHashMap;
 @Data
 @Slf4j
 public class TicketPool {
-    private int totalTickets;
+    private static int initialized;
+
     private String eventId;
     private String ticketPoolName;
     private int maxTicketCapacity;
     private String vendorId;
     private String ticketPoolDescription;
-    private boolean ticketCategories; // true if categories exist
-    private Map<String, Double> ticketPrice; // Category -> Price
-    private Map<String, Integer> ticketCategoriesQnt; // Category -> Quantity
+    private String eventLocation;
     private LocalDateTime date;
     private int ticketsSold = 0; // Tracks the number of tickets sold
 
-    private ConcurrentHashMap<String, Ticket> ticketArray = new ConcurrentHashMap<>();
+    private ConcurrentHashMap<String, Ticket> ticketArray;
+
+    private boolean ticketCategories; // true if categories exist
+    private Map<String, Double> ticketPrices; // Category -> Price
+    private Map<String, Integer> ticketCategoriesQnt; // Category -> Quantity
 
     public TicketPool(TicketPool ticketPool) {
         this.ticketPoolName = ticketPool.ticketPoolName;
@@ -31,6 +34,7 @@ public class TicketPool {
         this.maxTicketCapacity = ticketPool.maxTicketCapacity;
         this.eventId = ticketPool.eventId;
 
+        this.ticketArray = new ConcurrentHashMap<>(maxTicketCapacity);
         generateTickets();
     }
 
@@ -43,12 +47,13 @@ public class TicketPool {
             Ticket ticket = new Ticket(eventId, null); // Consumer ID is null for unsold tickets
             ticketArray.put(ticket.getTicketId(), ticket); // Store in the map
         }
-        log.info(" Array size : "+ticketArray.size());
+        log.info("Generated {} tickets. Array size: {}", maxTicketCapacity, ticketArray.size());
+        printTickets();
     }
 
     public void printTickets() {
-        for (int i = 0; i < ticketArray.size(); i++) {
-            log.info(" Ticket : "+i+" : " +ticketArray.get((i+1)+"").getTicketId());
+        for (Map.Entry<String, Ticket> entry : ticketArray.entrySet()) {
+            log.info(" Ticket ID: {} : Consumer ID: {}", entry.getValue().getTicketId(), entry.getValue().getConsumerId());
         }
     }
 
@@ -63,7 +68,6 @@ public class TicketPool {
                 return ticket; // Return the sold ticket
             }
         }
-
         // No tickets available
         return null;
     }
@@ -73,7 +77,7 @@ public class TicketPool {
         ticketArray.put(ticket.getTicketId(), ticket);
     }
 
-    public synchronized Ticket getTicket(String ticketId) {
+    public synchronized Ticket getTicket(int ticketId) {
         return ticketArray.get(ticketId);
     }
 
@@ -82,5 +86,3 @@ public class TicketPool {
     }
 
 }
-
-

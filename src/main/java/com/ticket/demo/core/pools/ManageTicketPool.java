@@ -20,6 +20,10 @@ public class ManageTicketPool {
         return ticketPoolArray.get(ticketPoolId);
     }
 
+    public int getTicketPoolArraySize(){
+        return ticketPoolArray.size();
+    }
+
     public void writeTicketPools(FileWriter writer) throws IOException {
         writer.write("\n=========== Ticket Pools ===========\n");
         for (Map.Entry<String, TicketPool> entry : ticketPoolArray.entrySet()) {
@@ -32,7 +36,7 @@ public class ManageTicketPool {
 
             // Write Ticket Details
             writer.write("  Tickets:\n");
-            for (Map.Entry<String, Ticket> ticketEntry : pool.getTicketArray().entrySet()) {
+            for (Map.Entry<Integer, Ticket> ticketEntry : pool.getTicketArray().entrySet()) {
                 Ticket ticket = ticketEntry.getValue();
                 writer.write("    Ticket ID: " + ticket.getTicketId()
                         + " | Status: " + (ticket.isSold() ? "Sold" : "Available")

@@ -8,25 +8,27 @@ import lombok.extern.slf4j.Slf4j;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.atomic.AtomicInteger;
 
 @Slf4j
 @Data
 public class Consumer implements Runnable {
+    private static AtomicInteger CONSUMERID = new AtomicInteger(1);
     private String consumerId;
     private String consumerName;
     private String consumerEmail;
-    @JsonIgnore
-    private String ticketId;
+    private String consumerPassword;
     @JsonIgnore
     private volatile boolean running = true; // Used to control the thread lifecycle
     @JsonIgnore
     private final BlockingQueue<TicketPool> taskQueue = new LinkedBlockingQueue<>(); // Tasks for this consumer
+    @JsonIgnore
     private ConcurrentHashMap<String, Ticket> consumerTicketsList = new ConcurrentHashMap<>();
 
     public Consumer(Consumer consumer) {
         this.consumerName = consumer.consumerName;
         this.consumerEmail = consumer.consumerEmail;
-        this.consumerId = consumer.consumerId;
+        this.consumerId = generateConsumerId();
     }
 
     public Consumer() {
@@ -62,5 +64,9 @@ public class Consumer implements Runnable {
                 log.info("Consumer [{}] interrupted.", consumerName);
             }
         }
+    }
+
+    public String generateConsumerId() {
+        return CONSUMERID.getAndIncrement()+"";
     }
 }

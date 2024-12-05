@@ -1,5 +1,7 @@
 package com.ticket.demo.core.pools;
 
+import com.ticket.demo.configuration.ConfigObserver;
+import com.ticket.demo.configuration.SystemConfiguration;
 import com.ticket.demo.core.Consumer;
 import com.ticket.demo.core.Ticket;
 import lombok.extern.slf4j.Slf4j;
@@ -13,15 +15,31 @@ import java.util.Map;
 
 @Component
 @Slf4j
-public class ManageConsumers {
+public class ManageConsumers implements ConfigObserver {
     private final HashMap<String, Consumer> consumerList = new HashMap<>();
     private final HashMap<String, Thread> consumerThreads = new HashMap<>();
+    private final SystemConfiguration systemConfig;
+    private int totalConsumers;
 
     @Autowired
     ManageTicketPool ticketPoolManager;
 
+    public ManageConsumers(SystemConfiguration systemConfig){
+        this.systemConfig = systemConfig;
+        this.systemConfig.addObserver(this);
+    }
+
+    @Override
+    public synchronized void updateConfiguration(SystemConfiguration config) {
+        totalConsumers = config.getTotalVendors();
+    }
+
     // Add a new Consumer and start its thread
     public synchronized void createConsumers(Consumer consumer) {
+        if (consumerList.size() >= systemConfig.getTotalVendors()) {
+            log.warn("Cannot add more consumers. Limit of [{}] reached.", totalConsumers);
+            return;
+        }
         Consumer newConsumer = new Consumer(consumer);
         consumerList.put(newConsumer.getConsumerId(), newConsumer);
 
@@ -40,7 +58,7 @@ public class ManageConsumers {
         }
         if (consumer1 != null) {
             TicketPool ticketPool = ticketPoolManager.getTicketPool(ticket.getEventId());
-            log.info("Ticket pool : " + ticketPool);
+            log.info("Ticket pool : {}", ticketPool);
 
             consumer1.addTask(ticketPool); // Add the event creation task to the Consumer's queue
 
